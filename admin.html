@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aditya School - Interactive Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Supabase Client Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        .fade-out { animation: fadeOut 0.5s ease-in forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
+        .hidden-element { display: none; }
+    </style>
+</head>
+<body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="login-section" class="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg fade-in">
+        <div class="text-center">
+            <h1 class="text-3xl font-bold text-slate-800">Admin Login</h1>
+            <p class="text-slate-500">Please enter your admin credentials.</p>
+        </div>
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label for="email" class="text-sm font-medium text-slate-700">Email</label>
+                <input type="email" id="email" name="email" required class="w-full px-4 py-2 mt-1 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+            <div>
+                <label for="password" class="text-sm font-medium text-slate-700">Password</label>
+                <input type="password" id="password" name="password" required class="w-full px-4 py-2 mt-1 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition">
+            </div>
+            <button type="submit" class="w-full flex justify-center items-center px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
+                <span id="login-button-text">Login</span>
+                <i id="login-spinner" class="fas fa-spinner fa-spin hidden ml-2"></i>
+            </button>
+        </form>
+        <p id="login-error" class="text-red-500 text-sm text-center hidden"></p>
+    </div>
+
+    <div id="upload-section" class="w-full max-w-2xl p-8 bg-white rounded-xl shadow-lg hidden-element">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-3xl font-bold text-slate-800">Upload Photos</h1>
+            <button id="logout-button" class="px-4 py-2 font-semibold text-slate-700 bg-slate-200 rounded-lg hover:bg-slate-300 transition">Logout</button>
+        </div>
+        
+        <div id="drop-zone" class="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition">
+            <div class="flex flex-col items-center">
+                <i class="fas fa-cloud-upload-alt text-4xl text-slate-400 mb-4"></i>
+                <p class="text-slate-600">Drag & drop photos here</p>
+                <p class="text-sm text-slate-500">or</p>
+                <label for="photo-upload" class="mt-2 text-blue-600 font-semibold cursor-pointer hover:underline">Click to select files</label>
+                <input type="file" id="photo-upload" class="hidden" multiple accept="image/png, image/jpeg">
+            </div>
+        </div>
+
+        <div id="preview-container" class="mt-6 space-y-3"></div>
+
+        <button id="upload-button" class="w-full mt-6 px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition">
+            Upload <span id="file-count">0</span> File(s)
+        </button>
+    </div>
+
+    <script>
+        // --- Supabase Configuration ---
+        const SUPABASE_URL = 'https://aoelpatewcvvywtltrso.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvZWxwYXRld2N2dnl3dGx0cnNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNDE4NDAsImV4cCI6MjA2ODYxNzg0MH0.sj1vYzmzkgVWzssSYiPDC-QZnp9Jznvzi7-Mo1gp0fA';
+
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- DOM Elements ---
+        const loginSection = document.getElementById('login-section');
+        const uploadSection = document.getElementById('upload-section');
+        const loginForm = document.getElementById('login-form');
+        const loginError = document.getElementById('login-error');
+        const loginButtonText = document.getElementById('login-button-text');
+        const loginSpinner = document.getElementById('login-spinner');
+        const logoutButton = document.getElementById('logout-button');
+        const dropZone = document.getElementById('drop-zone');
+        const photoUpload = document.getElementById('photo-upload');
+        const previewContainer = document.getElementById('preview-container');
+        const uploadButton = document.getElementById('upload-button');
+        const fileCountSpan = document.getElementById('file-count');
+
+        let filesToUpload = [];
+
+        // --- Authentication Logic ---
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.classList.add('hidden');
+            loginButtonText.classList.add('hidden');
+            loginSpinner.classList.remove('hidden');
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                loginError.textContent = error.message;
+                loginError.classList.remove('hidden');
+            } else if (data.user) {
+                showUploadSection();
+            }
+
+            loginButtonText.classList.remove('hidden');
+            loginSpinner.classList.add('hidden');
+        });
+
+        logoutButton.addEventListener('click', async () => {
+            await _supabase.auth.signOut();
+            showLoginSection();
+        });
+        
+        // --- UI Transition Functions ---
+        function showUploadSection() {
+            loginSection.classList.add('fade-out');
+            setTimeout(() => {
+                loginSection.classList.add('hidden-element');
+                uploadSection.classList.remove('hidden-element');
+                uploadSection.classList.add('fade-in');
+            }, 500);
+        }
+
+        function showLoginSection() {
+            uploadSection.classList.remove('fade-in');
+            uploadSection.classList.add('fade-out');
+            setTimeout(() => {
+                uploadSection.classList.add('hidden-element');
+                loginSection.classList.remove('hidden-element', 'fade-out');
+                loginSection.classList.add('fade-in');
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                loginError.classList.add('hidden');
+            }, 500);
+        }
+        
+        // --- Check Auth State on Load ---
+        async function checkAuthState() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                loginSection.classList.add('hidden-element');
+                uploadSection.classList.remove('hidden-element');
+            } else {
+                uploadSection.classList.add('hidden-element');
+                loginSection.classList.remove('hidden-element');
+            }
+        }
+        checkAuthState();
+
+        // --- File Handling and Preview Logic ---
+        dropZone.addEventListener('click', () => photoUpload.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-50'); });
+        dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-blue-500', 'bg-blue-50'); });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+            handleFiles(e.dataTransfer.files);
+        });
+        photoUpload.addEventListener('change', (e) => handleFiles(e.target.files));
+
+        function handleFiles(files) {
+            for (const file of files) {
+                if (file.type.startsWith('image/') && !filesToUpload.some(f => f.name === file.name && f.size === file.size)) {
+                    const fileWithId = { file, id: `preview-${Date.now()}-${Math.random()}` };
+                    filesToUpload.push(fileWithId);
+                    createFilePreview(fileWithId);
+                }
+            }
+            updateFileCount();
+        }
+
+        function createFilePreview({ file, id }) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const previewHTML = `
+                    <div id="${id}" class="flex items-center p-2 bg-slate-100 rounded-lg">
+                        <img src="${e.target.result}" alt="${file.name}" class="w-14 h-14 rounded-md object-cover mr-4">
+                        <div class="flex-grow">
+                            <p class="text-sm font-medium text-slate-800 truncate">${file.name}</p>
+                            <div class="w-full bg-slate-200 rounded-full h-2 mt-1">
+                                <div class="progress-bar bg-blue-500 h-2 rounded-full" style="width: 0%"></div>
+                            </div>
+                        </div>
+                        <div class="status-icon ml-4 text-xl"><i class="fas fa-hourglass-start text-slate-500"></i></div>
+                    </div>`;
+                previewContainer.innerHTML += previewHTML;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateFileCount() {
+            fileCountSpan.textContent = filesToUpload.length;
+            uploadButton.disabled = filesToUpload.length === 0;
+        }
+
+        // --- Upload Logic ---
+        uploadButton.addEventListener('click', async () => {
+            uploadButton.disabled = true;
+            const uploadPromises = filesToUpload.map(fileWithId => uploadFile(fileWithId));
+            await Promise.all(uploadPromises);
+            filesToUpload = [];
+            updateFileCount();
+        });
+
+        async function uploadFile({ file, id }) {
+            const previewElement = document.getElementById(id);
+            const progressBar = previewElement.querySelector('.progress-bar');
+            const statusIcon = previewElement.querySelector('.status-icon i');
+            statusIcon.className = 'fas fa-spinner fa-spin text-blue-500';
+
+            // *** THIS IS THE CORRECTED LINE ***
+            // We no longer add the 'public/' prefix.
+            const filePath = `${Date.now()}-${file.name}`;
+
+            const { error } = await _supabase.storage
+                .from('gallery-photos')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+
+            if (error) {
+                progressBar.style.width = '100%';
+                progressBar.classList.remove('bg-blue-500');
+                progressBar.classList.add('bg-red-500');
+                statusIcon.className = 'fas fa-times-circle text-red-500';
+                console.error('Upload Error:', error.message);
+            } else {
+                progressBar.style.width = '100%';
+                progressBar.classList.remove('bg-blue-500');
+                progressBar.classList.add('bg-green-500');
+                statusIcon.className = 'fas fa-check-circle text-green-500';
+            }
+        }
+    </script>
+</body>
+</html>
+<!-- End of file: index.html -->
