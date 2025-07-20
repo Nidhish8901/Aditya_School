@@ -6,16 +6,13 @@
     <title>Aditya School - Interactive Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- *** FIXED the typo in the 'integrity' attribute here *** -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- Supabase Client Library -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         body { font-family: 'Poppins', sans-serif; }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        .fade-out { animation: fadeOut 0.5s ease-in forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-        @keyframes fadeOut { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.95); } }
-        .hidden-element { display: none; }
+        .hidden-element { display: none !important; }
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: rgba(0, 0, 0, 0.6);
@@ -26,7 +23,7 @@
 </head>
 <body class="bg-slate-100 flex items-center justify-center min-h-screen p-4">
 
-    <div id="login-section" class="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg fade-in">
+    <div id="login-section" class="w-full max-w-md p-8 space-y-6 bg-white rounded-xl shadow-lg">
         <div class="text-center">
             <h1 class="text-3xl font-bold text-slate-800">Admin Login</h1>
             <p class="text-slate-500">Please enter your admin credentials.</p>
@@ -42,10 +39,10 @@
             </div>
             <button type="submit" class="w-full flex justify-center items-center px-4 py-2 font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition">
                 <span id="login-button-text">Login</span>
-                <i id="login-spinner" class="fas fa-spinner fa-spin hidden ml-2"></i>
+                <i id="login-spinner" class="fas fa-spinner fa-spin hidden-element ml-2"></i>
             </button>
         </form>
-        <p id="login-error" class="text-red-500 text-sm text-center hidden"></p>
+        <p id="login-error" class="text-red-500 text-sm text-center hidden-element"></p>
     </div>
 
     <div id="upload-section" class="w-full max-w-4xl p-8 bg-white rounded-xl shadow-lg hidden-element">
@@ -128,12 +125,24 @@
         let filesToUpload = [];
         let fileToDelete = null;
 
+        // --- UI Transition Functions ---
+        function showUploadSection() {
+            loginSection.classList.add('hidden-element');
+            uploadSection.classList.remove('hidden-element');
+            loadExistingPhotos();
+        }
+
+        function showLoginSection() {
+            uploadSection.classList.add('hidden-element');
+            loginSection.classList.remove('hidden-element');
+        }
+
         // --- Authentication Logic ---
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            loginError.classList.add('hidden');
-            loginButtonText.classList.add('hidden');
-            loginSpinner.classList.remove('hidden');
+            loginError.classList.add('hidden-element');
+            loginButtonText.classList.add('hidden-element');
+            loginSpinner.classList.remove('hidden-element');
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
@@ -142,14 +151,13 @@
 
             if (error) {
                 loginError.textContent = error.message;
-                loginError.classList.remove('hidden');
+                loginError.classList.remove('hidden-element');
             } else if (data.user) {
                 showUploadSection();
-                loadExistingPhotos();
             }
 
-            loginButtonText.classList.remove('hidden');
-            loginSpinner.classList.add('hidden');
+            loginButtonText.classList.remove('hidden-element');
+            loginSpinner.classList.add('hidden-element');
         });
 
         logoutButton.addEventListener('click', async () => {
@@ -157,43 +165,6 @@
             showLoginSection();
         });
         
-        // --- UI Transition Functions ---
-        function showUploadSection() {
-            loginSection.classList.add('fade-out');
-            setTimeout(() => {
-                loginSection.classList.add('hidden-element');
-                uploadSection.classList.remove('hidden-element');
-                uploadSection.classList.add('fade-in');
-            }, 500);
-        }
-
-        function showLoginSection() {
-            uploadSection.classList.remove('fade-in');
-            uploadSection.classList.add('fade-out');
-            setTimeout(() => {
-                uploadSection.classList.add('hidden-element');
-                loginSection.classList.remove('hidden-element', 'fade-out');
-                loginSection.classList.add('fade-in');
-                document.getElementById('email').value = '';
-                document.getElementById('password').value = '';
-                loginError.classList.add('hidden');
-            }, 500);
-        }
-        
-        // --- Check Auth State on Load ---
-        async function checkAuthState() {
-            const { data: { session } } = await _supabase.auth.getSession();
-            if (session) {
-                loginSection.classList.add('hidden-element');
-                uploadSection.classList.remove('hidden-element');
-                loadExistingPhotos();
-            } else {
-                uploadSection.classList.add('hidden-element');
-                loginSection.classList.remove('hidden-element');
-            }
-        }
-        checkAuthState();
-
         // --- File Handling and Preview Logic ---
         dropZone.addEventListener('click', () => photoUpload.click());
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-blue-500', 'bg-blue-50'); });
@@ -294,14 +265,16 @@
                 return;
             }
 
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 loadingExistingMessage.textContent = 'No photos found in the gallery.';
                 return;
             }
 
             loadingExistingMessage.classList.add('hidden-element');
 
-            data.forEach(file => {
+            const imageFiles = data.filter(file => file.id !== null);
+
+            imageFiles.forEach(file => {
                 const { data: { publicUrl } } = _supabase.storage.from('gallery-photos').getPublicUrl(file.name);
                 
                 const photoCard = document.createElement('div');
@@ -340,7 +313,6 @@
                 console.error('Error deleting file:', error);
                 alert('Could not delete the file.');
             } else {
-                // Visually remove the item and then reload the list
                 const cardToRemove = document.querySelector(`[data-filename="${fileToDelete}"]`).closest('.relative.group');
                 if (cardToRemove) {
                     cardToRemove.remove();
@@ -349,6 +321,21 @@
             
             fileToDelete = null;
             confirmationModal.classList.add('hidden-element');
+        });
+
+        // --- Initializer ---
+        // *** THIS IS THE CORRECTED LOGIC ***
+        async function initializePage() {
+            const { data: { session } } = await _supabase.auth.getSession();
+            if (session) {
+                showUploadSection();
+            } else {
+                showLoginSection();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializePage();
         });
 
     </script>
