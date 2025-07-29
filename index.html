@@ -21,8 +21,9 @@
 
     <style>
         body { font-family: 'Poppins', sans-serif; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .fade-in { animation: fadeIn 0.8s ease-out forwards; }
+        .page { display: none; } /* Hide all pages by default */
+        .page.active { display: block; animation: fadeIn 0.5s ease-out forwards; } /* Show only the active page */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .lightbox {
             display: none; position: fixed; z-index: 1000; left: 0; top: 0;
             width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8);
@@ -33,6 +34,25 @@
             position: absolute; top: 20px; right: 35px; color: #fff;
             font-size: 40px; font-weight: bold; transition: 0.3s; cursor: pointer;
         }
+        .nav-link.active {
+            color: #DC2626; /* Red color for active link */
+            font-weight: 600;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            overflow: hidden;
+            max-width: 100%;
+            background: #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-700">
@@ -40,155 +60,174 @@
     <!-- Header & Navigation Bar -->
     <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="#" class="flex items-center">
+            <a href="#" class="flex items-center nav-link" data-page="home">
                 <img src="https://aoelpatewcvvywtltrso.supabase.co/storage/v1/object/public/ui-assets//image_2025-07-29_120353700.png" alt="Aditya School Logo" class="h-16 md:h-20 mr-3">
             </a>
             
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#home" class="text-slate-600 hover:text-red-600 font-medium transition duration-300">Home</a>
-                <a href="#about" class="text-slate-600 hover:text-red-600 font-medium transition duration-300">About</a>
-                <a href="#academics" class="text-slate-600 hover:text-red-600 font-medium transition duration-300">Academics</a>
-                <a href="#gallery" class="text-slate-600 hover:text-red-600 font-medium transition duration-300">Gallery</a>
-                <a href="#contact" class="text-slate-600 hover:text-red-600 font-medium transition duration-300">Contact</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="home">Home</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="about">About</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="academics">Academics</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="gallery">Gallery</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="contact">Contact</a>
             </div>
-            <a href="#admissions" class="hidden md:block bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Admissions</a>
+            <a href="#" class="nav-link hidden md:block bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300" data-page="admissions">Admissions</a>
             <button id="mobile-menu-button" class="md:hidden text-2xl text-slate-700"><i class="fas fa-bars"></i></button>
         </nav>
         <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4 space-y-3 bg-white">
-            <a href="#home" class="block text-slate-600 hover:text-red-600 py-2">Home</a>
-            <a href="#about" class="block text-slate-600 hover:text-red-600 py-2">About Us</a>
-            <a href="#academics" class="block text-slate-600 hover:text-red-600 py-2">Academics</a>
-            <a href="#gallery" class="block text-slate-600 hover:text-red-600 py-2">Gallery</a>
-            <a href="#contact" class="block text-slate-600 hover:text-red-600 py-2">Contact</a>
-            <a href="#admissions" class="block mt-2 bg-red-600 text-white text-center px-4 py-2 rounded-full hover:bg-red-700">Admissions</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="home">Home</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="about">About Us</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="academics">Academics</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="gallery">Gallery</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="contact">Contact</a>
+            <a href="#" class="nav-link block mt-2 bg-red-600 text-white text-center px-4 py-2 rounded-full hover:bg-red-700" data-page="admissions">Admissions</a>
         </div>
     </header>
 
     <!-- Main Content -->
     <main>
-        <!-- Hero Section -->
-        <section id="home" class="relative text-white py-32 md:py-48 px-6 overflow-hidden">
-            <!-- *** UPDATED BACKGROUND IMAGE *** -->
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://aoelpatewcvvywtltrso.supabase.co/storage/v1/object/public/gallery-photos/BUILDING%20PHOT.jpg');"></div>
-            <div class="absolute inset-0 bg-gradient-to-r from-slate-900/70 to-red-900/60"></div>
-            <div class="container mx-auto text-center relative z-10 fade-in">
-                <h1 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight">Welcome to Aditya School</h1>
-                <p class="text-lg md:text-2xl max-w-4xl mx-auto mb-10 text-slate-200">Nurturing Young Minds for a Brighter, Successful Future</p>
-                <a href="#about" class="bg-white text-red-600 font-bold px-10 py-4 rounded-full hover:bg-slate-100 transition duration-300 text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
-                    Discover More <i class="fas fa-arrow-right ml-2"></i>
-                </a>
-            </div>
-        </section>
+        <!-- Home Page -->
+        <div id="page-home" class="page">
+            <section class="relative text-white py-32 md:py-48 px-6 overflow-hidden">
+                <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('https://aoelpatewcvvywtltrso.supabase.co/storage/v1/object/public/gallery-photos/BUILDING%20PHOT.jpg');"></div>
+                <div class="absolute inset-0 bg-gradient-to-r from-slate-900/70 to-red-900/60"></div>
+                <div class="container mx-auto text-center relative z-10">
+                    <h1 class="text-4xl md:text-6xl font-extrabold mb-4 tracking-tight">Welcome to Aditya School</h1>
+                    <p class="text-lg md:text-2xl max-w-4xl mx-auto mb-10 text-slate-200">Nurturing Young Minds for a Brighter, Successful Future</p>
+                    <a href="#" class="nav-link bg-white text-red-600 font-bold px-10 py-4 rounded-full hover:bg-slate-100 transition duration-300 text-lg shadow-xl" data-page="about">
+                        Discover More <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                </div>
+            </section>
+        </div>
 
-        <!-- About Us Section -->
-        <section id="about" class="py-24 px-6 bg-white">
-            <div class="container mx-auto">
-                <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
-                    <div class="lg:w-1/2">
-                        <img src="https://placehold.co/600x450/FEE2E2/991B1B?text=Our+Vibrant+Campus" alt="Aditya School Campus" class="rounded-xl shadow-2xl w-full transform hover:scale-105 transition-transform duration-500">
-                    </div>
-                    <div class="lg:w-1/2 text-center lg:text-left">
-                        <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Who We Are</h2>
-                        <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-6">Our Mission & Vision</h3>
-                        <p class="text-slate-600 leading-relaxed mb-4">
-                            At Aditya School, our mission is to provide a safe, disciplined, and productive environment that empowers students to gain the knowledge and skills to be responsible, successful, and contributing members of society.
-                        </p>
-                        <p class="text-slate-600 leading-relaxed">
-                            We are committed to fostering a love for learning, encouraging critical thinking, and developing strong moral character in every child. Our dedicated faculty and comprehensive curriculum ensure a well-rounded education for all.
-                        </p>
+        <!-- About Page -->
+        <div id="page-about" class="page">
+            <section class="py-24 px-6 bg-white">
+                <div class="container mx-auto">
+                    <div class="flex flex-col lg:flex-row items-center gap-12 lg:gap-20">
+                        <div class="lg:w-1/2">
+                            <img src="https://placehold.co/600x450/FEE2E2/991B1B?text=Our+Vibrant+Campus" alt="Aditya School Campus" class="rounded-xl shadow-2xl w-full">
+                        </div>
+                        <div class="lg:w-1/2 text-center lg:text-left">
+                            <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Who We Are</h2>
+                            <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-6">Our Mission & Vision</h3>
+                            <p class="text-slate-600 leading-relaxed mb-4">
+                                At Aditya School, our mission is to provide a safe, disciplined, and productive environment that empowers students to gain the knowledge and skills to be responsible, successful, and contributing members of society.
+                            </p>
+                            <p class="text-slate-600 leading-relaxed">
+                                We are committed to fostering a love for learning, encouraging critical thinking, and developing strong moral character in every child. Our dedicated faculty and comprehensive curriculum ensure a well-rounded education for all.
+                            </p>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
         
-        <!-- Academics Section -->
-        <section id="academics" class="py-24 px-6 bg-slate-50">
-            <div class="container mx-auto text-center">
-                <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Our Programs</h2>
-                <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-16">Academic Excellence</h3>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="bg-white border border-slate-200 p-8 rounded-xl shadow-md hover:shadow-xl hover:border-red-300 transition-all duration-300">
-                        <h4 class="text-2xl font-bold mb-4 text-red-700">Primary School</h4>
-                        <p class="text-slate-600">Building a strong foundation in core subjects through interactive and activity-based learning.</p>
-                    </div>
-                    <div class="bg-white border border-slate-200 p-8 rounded-xl shadow-md hover:shadow-xl hover:border-red-300 transition-all duration-300">
-                        <h4 class="text-2xl font-bold mb-4 text-red-700">Middle School</h4>
-                        <p class="text-slate-600">Encouraging students to explore their interests and develop critical thinking skills.</p>
-                    </div>
-                    <div class="bg-white border border-slate-200 p-8 rounded-xl shadow-md hover:shadow-xl hover:border-red-300 transition-all duration-300">
-                        <h4 class="text-2xl font-bold mb-4 text-red-700">High School</h4>
-                        <p class="text-slate-600">Preparing students for academic excellence and successful careers and university life.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Gallery Section -->
-        <section id="gallery" class="py-24 px-6 bg-white">
-            <div class="container mx-auto text-center">
-                <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Memories</h2>
-                <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-16">Campus Life & Events</h3>
-                <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <!-- Images from Supabase will be loaded here -->
-                    <p id="gallery-loading-message" class="col-span-full text-slate-500">Loading gallery...</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- Admissions Section -->
-        <section id="admissions" class="py-24 px-6 bg-slate-50">
-            <div class="container mx-auto text-center bg-gradient-to-r from-red-600 to-yellow-500 text-white p-12 lg:p-16 rounded-2xl shadow-2xl">
-                <h2 class="text-3xl md:text-5xl font-bold mb-4">Admissions Open for 2025-2026</h2>
-                <p class="max-w-2xl mx-auto mb-8 text-red-100 text-lg">
-                    Join the Aditya School family! We are now accepting applications. Contact our admissions office to learn more and schedule a campus tour.
-                </p>
-                <a href="#contact" class="bg-white text-red-600 font-bold px-8 py-3 rounded-full hover:bg-slate-100 transition duration-300 text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1">Inquire Now</a>
-            </div>
-        </section>
-
-        <!-- Contact Section -->
-        <section id="contact" class="bg-white py-24 px-6">
-            <div class="container mx-auto">
-                <div class="text-center">
-                    <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Get In Touch</h2>
-                    <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-16">Contact Us</h3>
-                </div>
-                <div class="flex flex-col lg:flex-row gap-12 items-center">
-                    <div class="lg:w-1/2 space-y-8">
-                        <div class="flex items-start gap-5">
-                            <div class="text-2xl text-red-600 mt-1"><i class="fas fa-map-marker-alt"></i></div>
-                            <div>
-                                <h4 class="text-xl font-semibold text-slate-800">Our Address</h4>
-                                <p class="text-slate-600">VHM8+229, Miryalaguda, Telangana 508207</p>
-                                <a href="https://maps.app.goo.gl/WDTMtNv3vSsfiq158" target="_blank" rel="noopener noreferrer" class="text-red-600 hover:underline font-semibold mt-1 inline-block">
-                                    Get Directions on Google Maps <i class="fas fa-external-link-alt text-xs ml-1"></i>
-                                </a>
-                            </div>
+        <!-- Academics Page -->
+        <div id="page-academics" class="page">
+            <section class="py-24 px-6 bg-slate-50">
+                <div class="container mx-auto text-center">
+                    <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Our Programs</h2>
+                    <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-16">Academic Excellence</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                        <div class="bg-white border border-slate-200 p-8 rounded-xl shadow-md">
+                            <h4 class="text-2xl font-bold mb-4 text-red-700">Primary School</h4>
+                            <p class="text-slate-600">Building a strong foundation in core subjects through interactive and activity-based learning.</p>
                         </div>
-                        <div class="flex items-start gap-5">
-                            <div class="text-2xl text-red-600 mt-1"><i class="fas fa-phone-alt"></i></div>
-                            <div>
-                                <h4 class="text-xl font-semibold text-slate-800">Phone</h4>
-                                <p class="text-slate-600">+91 9440565143</p>
-                            </div>
+                        <div class="bg-white border border-slate-200 p-8 rounded-xl shadow-md">
+                            <h4 class="text-2xl font-bold mb-4 text-red-700">Middle School</h4>
+                            <p class="text-slate-600">Encouraging students to explore their interests and develop critical thinking skills.</p>
                         </div>
-                        <div class="flex items-start gap-5">
-                            <div class="text-2xl text-red-600 mt-1"><i class="fas fa-envelope"></i></div>
-                            <div>
-                                <h4 class="text-xl font-semibold text-slate-800">Email Address</h4>
-                                <p class="text-slate-600">info@adityaschool.edu</p>
-                            </div>
+                        <div class="bg-white border border-slate-200 p-8 rounded-xl shadow-md">
+                            <h4 class="text-2xl font-bold mb-4 text-red-700">High School</h4>
+                            <p class="text-slate-600">Preparing students for academic excellence and successful careers and university life.</p>
                         </div>
                     </div>
-                    <div class="lg:w-1/2 h-80 md:h-96 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-                         <iframe 
-                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3824.786915228169!2d79.5626418758814!3d16.53509972688321!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcc475d15ffffff%3A0x6a65525ce037ae1a!2sAditya%20School!5e0!3m2!1sen!2sin!4v1695484832541!5m2!1sen!2sin" 
-                            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
-                        </iframe>
+                </div>
+            </section>
+        </div>
+
+        <!-- Gallery Page -->
+        <div id="page-gallery" class="page">
+            <section class="py-24 px-6 bg-white">
+                <div class="container mx-auto text-center">
+                    <!-- Photo Gallery Section -->
+                    <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Memories</h2>
+                    <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-16">Campus Life & Events</h3>
+                    <div id="gallery-grid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <p id="gallery-loading-message" class="col-span-full text-slate-500">Loading gallery...</p>
+                    </div>
+
+                    <!-- Video Gallery Section -->
+                    <hr class="my-20 border-t-2 border-slate-200">
+                    <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Videos</h2>
+                    <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-16">School Events & Activities</h3>
+                    <div id="videos-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <p id="videos-loading-message" class="col-span-full text-slate-500">Loading videos...</p>
                     </div>
                 </div>
-            </div>
-        </section>
+            </section>
+        </div>
+
+        <!-- Admissions Page -->
+        <div id="page-admissions" class="page">
+             <section class="py-24 px-6 bg-slate-50">
+                <div class="container mx-auto text-center bg-gradient-to-r from-red-600 to-yellow-500 text-white p-12 lg:p-16 rounded-2xl shadow-2xl">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-4">Admissions Open for 2025-2026</h2>
+                    <p class="max-w-2xl mx-auto mb-8 text-red-100 text-lg">
+                        Join the Aditya School family! We are now accepting applications. Contact our admissions office to learn more and schedule a campus tour.
+                    </p>
+                    <a href="#" class="nav-link bg-white text-red-600 font-bold px-8 py-3 rounded-full hover:bg-slate-100 transition duration-300 text-lg shadow-lg" data-page="contact">Inquire Now</a>
+                </div>
+            </section>
+        </div>
+
+        <!-- Contact Page -->
+        <div id="page-contact" class="page">
+            <section class="py-24 px-6 bg-white">
+                <div class="container mx-auto">
+                    <div class="text-center">
+                        <h2 class="text-sm font-bold uppercase text-red-600 tracking-widest mb-2">Get In Touch</h2>
+                        <h3 class="text-3xl md:text-4xl font-bold text-slate-800 mb-16">Contact Us</h3>
+                    </div>
+                    <div class="flex flex-col lg:flex-row gap-12 items-center">
+                        <div class="lg:w-1/2 space-y-8">
+                            <div class="flex items-start gap-5">
+                                <div class="text-2xl text-red-600 mt-1"><i class="fas fa-map-marker-alt"></i></div>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-slate-800">Our Address</h4>
+                                    <p class="text-slate-600">VHM8+229, Miryalaguda, Telangana 508207</p>
+                                    <a href="https://maps.app.goo.gl/WDTMtNv3vSsfiq158" target="_blank" rel="noopener noreferrer" class="text-red-600 hover:underline font-semibold mt-1 inline-block">
+                                        Get Directions on Google Maps <i class="fas fa-external-link-alt text-xs ml-1"></i>
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-5">
+                                <div class="text-2xl text-red-600 mt-1"><i class="fas fa-phone-alt"></i></div>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-slate-800">Phone</h4>
+                                    <p class="text-slate-600">+91 9440565143</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-5">
+                                <div class="text-2xl text-red-600 mt-1"><i class="fas fa-envelope"></i></div>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-slate-800">Email Address</h4>
+                                    <p class="text-slate-600">info@adityaschool.edu</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="lg:w-1/2 h-80 md:h-96 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
+                             <iframe 
+                                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3824.786915228169!2d79.5626418758814!3d16.53509972688321!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcc475d15ffffff%3A0x6a65525ce037ae1a!2sAditya%20School!5e0!3m2!1sen!2sin!4v1695484832541!5m2!1sen!2sin" 
+                                width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
 
     <!-- Footer -->
@@ -209,9 +248,53 @@
         // --- Supabase Configuration ---
         const SUPABASE_URL = 'https://aoelpatewcvvywtltrso.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvZWxwYXRld2N2dnl3dGx0cnNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNDE4NDAsImV4cCI6MjA2ODYxNzg0MH0.sj1vYzmzkgVWzssSYiPDC-QZnp9Jznvzi7-Mo1gp0fA';
-
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- Page Navigation Logic ---
+        const pages = document.querySelectorAll('.page');
+        const navLinks = document.querySelectorAll('.nav-link');
+        let galleryLoaded = false;
+        let videosLoaded = false; // Flag to check if videos have been loaded
+
+        function showPage(pageId) {
+            pages.forEach(page => page.classList.remove('active'));
+            const newPage = document.getElementById(`page-${pageId}`);
+            if (newPage) {
+                newPage.classList.add('active');
+            }
+
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.dataset.page === pageId);
+            });
+
+            window.scrollTo(0, 0);
+
+            if (pageId === 'gallery') {
+                if (!galleryLoaded) {
+                    loadGalleryImages();
+                    galleryLoaded = true;
+                }
+                if (!videosLoaded) {
+                    loadVideos();
+                    videosLoaded = true;
+                }
+            }
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const pageId = e.currentTarget.dataset.page;
+                showPage(pageId);
+                // Close mobile menu on navigation
+                if (!mobileMenu.classList.contains('hidden')) {
+                    mobileMenu.classList.add('hidden');
+                    menuIcon.classList.remove('fa-times');
+                    menuIcon.classList.add('fa-bars');
+                }
+            });
+        });
 
         // --- Mobile Menu Toggle ---
         const mobileMenuButton = document.getElementById('mobile-menu-button');
@@ -231,49 +314,29 @@
         const galleryGrid = document.getElementById('gallery-grid');
         const loadingMessage = document.getElementById('gallery-loading-message');
 
-        // Function to load images from Supabase Storage
         async function loadGalleryImages() {
-            const { data, error } = await _supabase.storage
-                .from('gallery-photos')
-                .list('', {
-                    limit: 100,
-                    sortBy: { column: 'created_at', order: 'desc' },
-                });
-
+            const { data, error } = await _supabase.storage.from('gallery-photos').list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
             if (error) {
-                console.error('Error fetching images:', error);
                 loadingMessage.textContent = 'Could not load gallery images.';
                 return;
             }
-            
             if (!data || data.length === 0) {
-                 loadingMessage.textContent = 'No images in the gallery yet.';
-                 return;
+                loadingMessage.textContent = 'No images in the gallery yet.';
+                return;
             }
-
-            loadingMessage.style.display = 'none'; // Hide loading message
-            galleryGrid.innerHTML = ''; // Clear the grid
-
+            loadingMessage.style.display = 'none';
+            galleryGrid.innerHTML = '';
             const imageFiles = data.filter(file => file.id !== null);
-
             imageFiles.forEach(file => {
-                const { data: { publicUrl } } = _supabase.storage
-                    .from('gallery-photos')
-                    .getPublicUrl(file.name);
-                
-                const galleryItemHTML = `
+                const { data: { publicUrl } } = _supabase.storage.from('gallery-photos').getPublicUrl(file.name);
+                galleryGrid.innerHTML += `
                     <div class="overflow-hidden rounded-lg shadow-md cursor-pointer">
                         <img src="${publicUrl}" alt="Aditya School Gallery Image" class="gallery-item w-full h-full object-cover transform hover:scale-110 transition-transform duration-300">
-                    </div>
-                `;
-                galleryGrid.innerHTML += galleryItemHTML;
+                    </div>`;
             });
-            
-            // Re-initialize lightbox for the new images
             setupLightbox();
         }
 
-        // Function to set up lightbox event listeners
         function setupLightbox() {
             const galleryItems = document.querySelectorAll('.gallery-item');
             galleryItems.forEach(item => {
@@ -284,19 +347,41 @@
             });
         }
 
-        const closeLightbox = () => {
-            lightbox.style.display = 'none';
+        const closeLightbox = () => { lightbox.style.display = 'none'; }
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) { closeLightbox(); } });
+
+        // --- Videos Logic ---
+        const videosGrid = document.getElementById('videos-grid');
+        const videosLoadingMessage = document.getElementById('videos-loading-message');
+
+        async function loadVideos() {
+            const { data, error } = await _supabase.from('videos').select('*').order('created_at', { ascending: false });
+            if (error) {
+                videosLoadingMessage.textContent = 'Could not load videos.';
+                return;
+            }
+            if (!data || data.length === 0) {
+                videosLoadingMessage.textContent = 'No videos have been added yet.';
+                return;
+            }
+            videosLoadingMessage.style.display = 'none';
+            videosGrid.innerHTML = '';
+            data.forEach(video => {
+                videosGrid.innerHTML += `
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <div class="video-container rounded-lg overflow-hidden">
+                            <iframe src="https://www.youtube.com/embed/${video.youtube_id}" title="${video.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <h3 class="font-semibold text-lg mt-4 text-left">${video.title}</h3>
+                    </div>`;
+            });
         }
 
-        lightboxClose.addEventListener('click', closeLightbox);
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) {
-                closeLightbox();
-            }
+        // Load the initial page
+        document.addEventListener('DOMContentLoaded', () => {
+            showPage('home');
         });
-
-        // Load the gallery when the page loads
-        document.addEventListener('DOMContentLoaded', loadGalleryImages);
     </script>
 
 </body>
