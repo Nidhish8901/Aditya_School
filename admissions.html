@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admissions - Aditya School</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: 'Poppins', sans-serif; }
+        /* Custom styles for table inputs */
+        .academic-table input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.375rem;
+            box-shadow: sm;
+        }
+    </style>
+</head>
+<body class="bg-slate-100">
+
+    <div class="container mx-auto p-4 sm:p-8 max-w-4xl">
+        <div class="bg-white p-8 rounded-xl shadow-lg">
+            <div class="text-center mb-8">
+                <a href="index.html">
+                    <img src="https://aoelpatewcvvywtltrso.supabase.co/storage/v1/object/public/ui-assets//image_2025-07-29_120353700.png" alt="Aditya School Logo" class="h-24 mx-auto mb-4">
+                </a>
+                <h1 class="text-3xl font-bold text-slate-800">Admission Form</h1>
+                <p class="text-slate-500">Please fill out the details below carefully.</p>
+            </div>
+
+            <form id="admission-form" class="space-y-8">
+                <!-- Personal Details -->
+                <fieldset class="space-y-6">
+                    <legend class="text-lg font-semibold text-slate-800 border-b border-slate-300 w-full pb-2 mb-4">1. Candidate's Details</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label for="full_name" class="block text-sm font-medium text-slate-700">Full Name (in capitals)</label>
+                            <input type="text" id="full_name" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label for="admission_class" class="block text-sm font-medium text-slate-700">Joining for Class</label>
+                            <input type="text" id="admission_class" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label for="dob" class="block text-sm font-medium text-slate-700">Date of Birth</label>
+                            <input type="date" id="dob" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                        </div>
+                        <div>
+                            <label for="gender" class="block text-sm font-medium text-slate-700">Gender</label>
+                            <select id="gender" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-red-500 focus:ring-red-500">
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="aadhaar_number" class="block text-sm font-medium text-slate-700">Aadhaar Number</label>
+                            <input type="text" id="aadhaar_number" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm" pattern="\d{12}" title="Aadhaar number must be exactly 12 digits." maxlength="12">
+                        </div>
+                        <div>
+                            <label for="aadhaar_name" class="block text-sm font-medium text-slate-700">Name as per Aadhaar</label>
+                            <input type="text" id="aadhaar_name" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Guardian Details -->
+                <fieldset class="space-y-6">
+                    <legend class="text-lg font-semibold text-slate-800 border-b border-slate-300 w-full pb-2 mb-4">2. Parent's / Guardian's Details</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                         <div>
+                            <label for="father_name" class="block text-sm font-medium text-slate-700">Father's Full Name</label>
+                            <input type="text" id="father_name" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="mother_name" class="block text-sm font-medium text-slate-700">Mother's Full Name</label>
+                            <input type="text" id="mother_name" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                         <div>
+                            <label for="guardian_name" class="block text-sm font-medium text-slate-700">Guardian's Full Name (if applicable)</label>
+                            <input type="text" id="guardian_name" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- Contact & Address -->
+                <fieldset class="space-y-6">
+                    <legend class="text-lg font-semibold text-slate-800 border-b border-slate-300 w-full pb-2 mb-4">3. Contact Information</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label for="address" class="block text-sm font-medium text-slate-700">Address</label>
+                            <textarea id="address" rows="3" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm"></textarea>
+                        </div>
+                         <div>
+                            <label for="mobile_number" class="block text-sm font-medium text-slate-700">Mobile Number</label>
+                            <input type="tel" id="mobile_number" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm" pattern="\d{10}" title="Mobile number must be exactly 10 digits." maxlength="10">
+                        </div>
+                         <div>
+                            <label for="neighbour_number" class="block text-sm font-medium text-slate-700">Neighbour's Number</label>
+                            <input type="tel" id="neighbour_number" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm" pattern="\d{10}" title="Number must be exactly 10 digits." maxlength="10">
+                        </div>
+                        <div>
+                            <label for="email" class="block text-sm font-medium text-slate-700">Email ID</label>
+                            <input type="email" id="email" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                         <div>
+                            <label for="pincode" class="block text-sm font-medium text-slate-700">Pin Code</label>
+                            <input type="text" id="pincode" required class="mt-1 block w-full rounded-md border-slate-300 shadow-sm" pattern="\d{6}" title="Pincode must be exactly 6 digits." maxlength="6">
+                        </div>
+                    </div>
+                </fieldset>
+                
+                <!-- Other Details -->
+                <fieldset class="space-y-6">
+                    <legend class="text-lg font-semibold text-slate-800 border-b border-slate-300 w-full pb-2 mb-4">4. Other Information</legend>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div>
+                            <label for="mother_tongue" class="block text-sm font-medium text-slate-700">Mother Tongue</label>
+                            <input type="text" id="mother_tongue" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="social_category" class="block text-sm font-medium text-slate-700">Social Category</label>
+                            <input type="text" id="social_category" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="sub_caste" class="block text-sm font-medium text-slate-700">Sub-caste</label>
+                            <input type="text" id="sub_caste" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="religion" class="block text-sm font-medium text-slate-700">Religion</label>
+                            <input type="text" id="religion" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="nationality" class="block text-sm font-medium text-slate-700">Nationality</label>
+                            <input type="text" id="nationality" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="pen_number" class="block text-sm font-medium text-slate-700">PEN Number</label>
+                            <input type="text" id="pen_number" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="blood_group" class="block text-sm font-medium text-slate-700">Blood Group</label>
+                            <input type="text" id="blood_group" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="height_cm" class="block text-sm font-medium text-slate-700">Height (cm)</label>
+                            <input type="number" id="height_cm" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="weight_kg" class="block text-sm font-medium text-slate-700">Weight (kg)</label>
+                            <input type="number" id="weight_kg" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700">BPL Beneficiary?</label>
+                            <div class="mt-2 space-x-4"><label><input type="radio" name="bpl_beneficiary" value="Yes"> Yes</label><label><input type="radio" name="bpl_beneficiary" value="No" checked> No</label></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700">Belongs to EWS?</label>
+                            <div class="mt-2 space-x-4"><label><input type="radio" name="ews_status" value="Yes"> Yes</label><label><input type="radio" name="ews_status" value="No" checked> No</label></div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700">Belongs to CWSN?</label>
+                            <div class="mt-2 space-x-4"><label><input type="radio" name="cwsn_status" value="Yes"> Yes</label><label><input type="radio" name="cwsn_status" value="No" checked> No</label></div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label for="cwsn_category" class="block text-sm font-medium text-slate-700">If CWSN, mention category</label>
+                            <input type="text" id="cwsn_category" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                        <div>
+                            <label for="disability_percentage" class="block text-sm font-medium text-slate-700">Disability Percentage (%)</label>
+                            <input type="number" id="disability_percentage" class="mt-1 block w-full rounded-md border-slate-300 shadow-sm">
+                        </div>
+                    </div>
+                </fieldset>
+
+                <!-- *** UPDATED ACADEMIC RECORD SECTION *** -->
+                <fieldset>
+                    <legend class="text-lg font-semibold text-slate-800 border-b border-slate-300 w-full pb-2 mb-4">5. Previous Academic Record (Last 5 Years)</legend>
+                    <div class="overflow-x-auto">
+                        <table id="previous-academic-table" class="min-w-full text-sm academic-table">
+                            <thead class="bg-slate-100">
+                                <tr>
+                                    <th class="p-2 text-left font-medium text-slate-600">Name of School</th>
+                                    <th class="p-2 text-left font-medium text-slate-600">Class</th>
+                                    <th class="p-2 text-left font-medium text-slate-600">Year</th>
+                                    <th class="p-2 text-left font-medium text-slate-600">Medium</th>
+                                    <th class="p-2 text-left font-medium text-slate-600">Syllabus</th>
+                                    <th class="p-2 text-left font-medium text-slate-600">% in Final Exam</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 5 rows will be generated by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </fieldset>
+
+                <div class="pt-8 text-center">
+                    <button type="submit" id="submit-button" class="px-8 py-3 font-semibold text-white bg-red-600 rounded-lg hover:bg-red-700">Submit Application</button>
+                </div>
+            </form>
+            
+            <div id="success-message" class="hidden text-center p-8 bg-green-100 text-green-800 rounded-lg">
+                <h2 class="text-2xl font-bold mb-4">Application Submitted!</h2>
+                <p>Thank you for your interest in Aditya School. We have received your application and will get in touch with you shortly.</p>
+                <a href="index.html" class="inline-block mt-6 px-6 py-2 bg-green-600 text-white rounded-lg">Back to Home</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://aoelpatewcvvywtltrso.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvZWxwYXRld2N2dnl3dGx0cnNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNDE4NDAsImV4cCI6MjA2ODYxNzg0MH0.sj1vYzmzkgVWzssSYiPDC-QZnp9Jznvzi7-Mo1gp0fA';
+        const { createClient } = supabase;
+        const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const form = document.getElementById('admission-form');
+        const successMessage = document.getElementById('success-message');
+        const submitButton = document.getElementById('submit-button');
+        const academicTableBody = document.querySelector('#previous-academic-table tbody');
+
+        // --- Generate table rows ---
+        for (let i = 0; i < 5; i++) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td class="p-1"><input type="text" name="school_name_${i}"></td>
+                <td class="p-1"><input type="text" name="class_${i}"></td>
+                <td class="p-1"><input type="text" name="year_${i}"></td>
+                <td class="p-1"><input type="text" name="medium_${i}"></td>
+                <td class="p-1"><input type="text" name="syllabus_${i}"></td>
+                <td class="p-1"><input type="text" name="percentage_${i}"></td>
+            `;
+            academicTableBody.appendChild(row);
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+
+            // --- Collect Academic Record Data ---
+            const academicRecords = [];
+            const rows = academicTableBody.querySelectorAll('tr');
+            rows.forEach((row, i) => {
+                const school_name = row.querySelector(`input[name="school_name_${i}"]`).value;
+                // Only add row if school name is filled
+                if (school_name) {
+                    academicRecords.push({
+                        school_name: school_name,
+                        class: row.querySelector(`input[name="class_${i}"]`).value,
+                        year: row.querySelector(`input[name="year_${i}"]`).value,
+                        medium: row.querySelector(`input[name="medium_${i}"]`).value,
+                        syllabus: row.querySelector(`input[name="syllabus_${i}"]`).value,
+                        percentage: row.querySelector(`input[name="percentage_${i}"]`).value,
+                    });
+                }
+            });
+
+            const admissionData = {
+                full_name: document.getElementById('full_name').value,
+                admission_class: document.getElementById('admission_class').value,
+                dob: document.getElementById('dob').value,
+                gender: document.getElementById('gender').value,
+                father_name: document.getElementById('father_name').value,
+                mother_name: document.getElementById('mother_name').value,
+                guardian_name: document.getElementById('guardian_name').value,
+                aadhaar_number: document.getElementById('aadhaar_number').value,
+                aadhaar_name: document.getElementById('aadhaar_name').value,
+                address: document.getElementById('address').value,
+                mobile_number: document.getElementById('mobile_number').value,
+                neighbour_number: document.getElementById('neighbour_number').value,
+                email: document.getElementById('email').value,
+                pincode: document.getElementById('pincode').value,
+                mother_tongue: document.getElementById('mother_tongue').value,
+                social_category: document.getElementById('social_category').value,
+                sub_caste: document.getElementById('sub_caste').value,
+                religion: document.getElementById('religion').value,
+                nationality: document.getElementById('nationality').value,
+                pen_number: document.getElementById('pen_number').value,
+                blood_group: document.getElementById('blood_group').value,
+                height_cm: document.getElementById('height_cm').value,
+                weight_kg: document.getElementById('weight_kg').value,
+                bpl_beneficiary: document.querySelector('input[name="bpl_beneficiary"]:checked').value,
+                ews_status: document.querySelector('input[name="ews_status"]:checked').value,
+                cwsn_status: document.querySelector('input[name="cwsn_status"]:checked').value,
+                cwsn_category: document.getElementById('cwsn_category').value,
+                disability_percentage: document.getElementById('disability_percentage').value,
+                previous_school_record: JSON.stringify(academicRecords), // Save as JSON string
+            };
+
+            const { error } = await _supabase.from('admissions').insert([admissionData]);
+
+            if (error) {
+                console.error('Error submitting application:', error);
+                alert('There was an error submitting your application. Please try again.');
+                submitButton.disabled = false;
+                submitButton.textContent = 'Submit Application';
+            } else {
+                form.classList.add('hidden');
+                successMessage.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>
