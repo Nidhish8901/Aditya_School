@@ -21,8 +21,8 @@
 
     <style>
         body { font-family: 'Poppins', sans-serif; }
-        .page { display: none; }
-        .page.active { display: block; animation: fadeIn 0.5s ease-out forwards; }
+        .page { display: none; } /* Hide all pages by default */
+        .page.active { display: block; animation: fadeIn 0.5s ease-out forwards; } /* Show only the active page */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .lightbox {
             display: none; position: fixed; z-index: 1000; left: 0; top: 0;
@@ -60,29 +60,31 @@
     <!-- Header & Navigation Bar -->
     <header class="bg-white/80 backdrop-blur-lg shadow-sm sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
-            <a href="index.html" class="flex items-center">
+            <a href="#" class="flex items-center nav-link" data-page="home">
                 <img src="https://aoelpatewcvvywtltrso.supabase.co/storage/v1/object/public/ui-assets//image_2025-07-29_120353700.png" alt="Aditya School Logo" class="h-16 md:h-20 mr-3">
             </a>
+            
             <div class="hidden md:flex items-center space-x-8">
-                <a href="#" class="nav-link" data-page="home">Home</a>
-                <a href="#" class="nav-link" data-page="about">About</a>
-                <a href="#" class="nav-link" data-page="academics">Academics</a>
-                <a href="#" class="nav-link" data-page="gallery">Gallery</a>
-                <a href="#" class="nav-link" data-page="contact">Contact</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="home">Home</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="about">About</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="academics">Academics</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="gallery">Gallery</a>
+                <a href="#" class="nav-link text-slate-600 hover:text-red-600 font-medium transition duration-300" data-page="contact">Contact</a>
             </div>
-            <a href="admissions.html" class="hidden md:block bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700">Admissions</a>
-            <button id="mobile-menu-button" class="md:hidden text-2xl"><i class="fas fa-bars"></i></button>
+            <a href="admissions.html" class="hidden md:block bg-red-600 text-white px-6 py-2.5 rounded-full font-semibold hover:bg-red-700 hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-300">Admissions</a>
+            <button id="mobile-menu-button" class="md:hidden text-2xl text-slate-700"><i class="fas fa-bars"></i></button>
         </nav>
         <div id="mobile-menu" class="hidden md:hidden px-6 pt-2 pb-4 space-y-3 bg-white">
-            <a href="#" class="nav-link block py-2" data-page="home">Home</a>
-            <a href="#" class="nav-link block py-2" data-page="about">About Us</a>
-            <a href="#" class="nav-link block py-2" data-page="academics">Academics</a>
-            <a href="#" class="nav-link block py-2" data-page="gallery">Gallery</a>
-            <a href="#" class="nav-link block py-2" data-page="contact">Contact</a>
-            <a href="admissions.html" class="block mt-2 bg-red-600 text-white text-center px-4 py-2 rounded-full">Admissions</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="home">Home</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="about">About Us</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="academics">Academics</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="gallery">Gallery</a>
+            <a href="#" class="nav-link block text-slate-600 hover:text-red-600 py-2" data-page="contact">Contact</a>
+            <a href="admissions.html" class="block mt-2 bg-red-600 text-white text-center px-4 py-2 rounded-full hover:bg-red-700">Admissions</a>
         </div>
     </header>
 
+    <!-- Main Content -->
     <main>
         <!-- Home Page -->
         <div id="page-home" class="page">
@@ -199,7 +201,7 @@
                                 <div class="text-2xl text-red-600 mt-1"><i class="fas fa-envelope"></i></div>
                                 <div>
                                     <h4 class="text-xl font-semibold text-slate-800">Email Address</h4>
-                                    <p class="text-slate-600">adityahighschool008@gmail.com</p>
+                                    <p class="text-slate-600">info@adityaschool.edu</p>
                                 </div>
                             </div>
                         </div>
@@ -228,11 +230,14 @@
     </div>
 
     <script>
+        // --- Supabase Configuration ---
         const SUPABASE_URL = 'https://aoelpatewcvvywtltrso.supabase.co';
+        // *** THIS KEY HAS BEEN CORRECTED ***
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFvZWxwYXRld2N2dnl3dGx0cnNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTMwNDE4NDAsImV4cCI6MjA2ODYxNzg0MH0.sj1vYzmzkgVWzssSYiPDC-QZnp9Jznvzi7-Mo1gp0fA';
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // --- Page Navigation Logic ---
         const pages = document.querySelectorAll('.page');
         const navLinks = document.querySelectorAll('.nav-link');
         let galleryLoaded = false;
@@ -284,15 +289,67 @@
         const galleryGrid = document.getElementById('gallery-grid');
         const loadingMessage = document.getElementById('gallery-loading-message');
 
-        async function loadGalleryImages() { /* ... same as before ... */ }
-        function setupLightbox() { /* ... same as before ... */ }
+        async function loadGalleryImages() {
+            const { data, error } = await _supabase.storage.from('gallery-photos').list('', { limit: 100, sortBy: { column: 'created_at', order: 'desc' } });
+            if (error) {
+                loadingMessage.textContent = 'Could not load gallery images.';
+                return;
+            }
+            if (!data || data.filter(f => f.id !== null).length === 0) {
+                loadingMessage.textContent = 'No images in the gallery yet.';
+                return;
+            }
+            loadingMessage.style.display = 'none';
+            galleryGrid.innerHTML = '';
+            const imageFiles = data.filter(file => file.id !== null);
+            imageFiles.forEach(file => {
+                const { data: { publicUrl } } = _supabase.storage.from('gallery-photos').getPublicUrl(file.name);
+                galleryGrid.innerHTML += `
+                    <div class="overflow-hidden rounded-lg shadow-md cursor-pointer">
+                        <img src="${publicUrl}" alt="Aditya School Gallery Image" class="gallery-item w-full h-full object-cover transform hover:scale-110 transition-transform duration-300">
+                    </div>`;
+            });
+            setupLightbox();
+        }
+
+        function setupLightbox() {
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            galleryItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    lightbox.style.display = 'flex';
+                    lightboxImage.src = item.src;
+                });
+            });
+        }
+
         const closeLightbox = () => { lightbox.style.display = 'none'; }
         lightboxClose.addEventListener('click', closeLightbox);
         lightbox.addEventListener('click', (e) => { if (e.target === lightbox) { closeLightbox(); } });
 
         const videosGrid = document.getElementById('videos-grid');
         const videosLoadingMessage = document.getElementById('videos-loading-message');
-        async function loadVideos() { /* ... same as before ... */ }
+        async function loadVideos() {
+            const { data, error } = await _supabase.from('videos').select('*').order('created_at', { ascending: false });
+            if (error) {
+                videosLoadingMessage.textContent = 'Could not load videos.';
+                return;
+            }
+            if (!data || data.length === 0) {
+                videosLoadingMessage.textContent = 'No videos have been added yet.';
+                return;
+            }
+            videosLoadingMessage.style.display = 'none';
+            videosGrid.innerHTML = '';
+            data.forEach(video => {
+                videosGrid.innerHTML += `
+                    <div class="bg-white p-4 rounded-lg shadow-md">
+                        <div class="video-container rounded-lg overflow-hidden">
+                            <iframe src="https://www.youtube.com/embed/${video.youtube_id}" title="${video.title}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                        <h3 class="font-semibold text-lg mt-4 text-left">${video.title}</h3>
+                    </div>`;
+            });
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
             showPage('home');
