@@ -6,18 +6,13 @@
     <title>Aditya School - Admin Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" xintegrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         body { font-family: 'Poppins', sans-serif; }
         .hidden-element { display: none !important; }
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0, 0, 0, 0.6);
-            display: flex; justify-content: center; align-items: center;
-            z-index: 1000;
-        }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.6); display: flex; justify-content: center; align-items: center; z-index: 1000; }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen p-4">
@@ -121,13 +116,11 @@
     </div>
 
     <script>
-        // --- Supabase Config (UPDATED HERE) ---
         const SUPABASE_URL = 'https://esfvpokamvyyuaauvnts.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVzZnZwb2thbXZ5eXVhYXV2bnRzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxNDMwOTIsImV4cCI6MjA5MDcxOTA5Mn0.ROxuwRg6Jo3JWnRCGUWQ9NZ64ag1UnjBAq0_iQcseXg';
         const { createClient } = supabase;
         const _supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- DOM Elements ---
         const loginSection = document.getElementById('login-section');
         const managementSection = document.getElementById('management-section');
         const loginForm = document.getElementById('login-form');
@@ -155,7 +148,6 @@
         let itemToDelete = null;
         let allAdmissionsData = [];
 
-        // --- UI Functions ---
         function showManagementSection() {
             loginSection.classList.add('hidden-element');
             managementSection.classList.remove('hidden-element');
@@ -173,7 +165,6 @@
             loadExistingPhotos();
         }
 
-        // --- Auth ---
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             loginError.classList.add('hidden-element');
@@ -198,7 +189,6 @@
             showLoginSection();
         });
         
-        // --- Admissions Logic ---
         async function loadExistingAdmissions() {
             const { data, error } = await _supabase.from('admissions').select('*').order('created_at', { ascending: false });
             if (error) {
@@ -232,7 +222,6 @@
             XLSX.writeFile(workbook, "AdityaSchool_Admissions.xlsx");
         });
 
-        // --- Videos Logic ---
         videoForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const titleInput = document.getElementById('video-title');
@@ -280,7 +269,6 @@
             `).join('');
         }
 
-        // --- Photos Logic ---
         dropZone.addEventListener('click', () => photoUpload.click());
         dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('border-red-500', 'bg-red-50'); });
         dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-red-500', 'bg-red-50'); });
@@ -366,7 +354,6 @@
             });
         }
 
-        // --- Generic Deletion Logic ---
         document.addEventListener('click', (e) => {
             const button = e.target.closest('.delete-item-button');
             if (button) {
@@ -406,7 +393,6 @@
             itemToDelete = null;
         });
 
-        // --- Initializer ---
         document.addEventListener('DOMContentLoaded', async () => {
             const { data: { session } } = await _supabase.auth.getSession();
             if (session) {
